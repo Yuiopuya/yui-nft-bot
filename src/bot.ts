@@ -1,4 +1,4 @@
-
+import { listNetworks } from "./chains-registry";
 import "dotenv/config";
 import { Telegraf } from "telegraf";
 
@@ -56,7 +56,13 @@ bot.command("wallets", (ctx) =>
 bot.command("budget", (ctx) =>
   ctx.reply("💰 Spending is disabled until budget controls are installed.")
 );
-
+bot.command("chains", (ctx) => {
+  return ctx.reply(
+    "🌐 Supported network registry:\n\n" +
+    listNetworks() +
+    "\n\n⚠️ Live minting is not enabled."
+  );
+});
 bot.launch()
   .then(() => console.log("NFT Scout Agent running"))
   .catch(console.error);
