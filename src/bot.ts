@@ -71,9 +71,18 @@ bot.command("discover", async (ctx) => {
     );
   }
 
-  const drops = await discoverFreeMints(
+  let drops;
+
+try {
+  drops = await discoverFreeMints(
     chain as keyof typeof NETWORKS | undefined
   );
+} catch (error) {
+  console.error("Discovery failed:", error);
+  return ctx.reply(
+    "⚠️ Discovery is temporarily unavailable. Try again later."
+  );
+}
 
   if (drops.length === 0) {
     return ctx.reply(
@@ -82,14 +91,18 @@ bot.command("discover", async (ctx) => {
     );
   }
 
-  return ctx.reply(
-    drops.map(drop =>
-      `🎨 ${drop.name}\n` +
-      `Chain: ${drop.chain}\n` +
-      `Price: FREE (network fees may apply)\n` +
-      `Source: ${drop.source}`
-    ).join("\n\n")
-  );
+ 
+return ctx.reply(
+  drops.map(drop =>
+    `🎨 ${drop.name}\n` +
+    `Chain: ${drop.chain}\n` +
+    `Reported price: 0 (eligibility unverified)\n` +
+    `Contract: ${drop.contractAddress ?? "Unknown"}\n` +
+    `Mint date: ${drop.mintDate ?? "Unknown"}\n` +
+    `Mint link: ${drop.mintUrl ?? "Unavailable"}\n` +
+    `Source: ${drop.source}`
+  ).join("\n\n")
+);
 });
 
 bot.launch()

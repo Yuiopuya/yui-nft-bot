@@ -1,4 +1,4 @@
-
+import { fetchOpenSeaDrops } from "./opensea";
 import { NETWORKS } from "../chains-registry";
 
 export interface NFTDrop {
@@ -16,11 +16,11 @@ export function isFreeMint(drop: NFTDrop): boolean {
   return drop.mintPrice === "0";
 }
 
+
 export async function discoverFreeMints(
   chain?: keyof typeof NETWORKS
 ): Promise<NFTDrop[]> {
-  // Live discovery providers will be connected next.
-  const drops: NFTDrop[] = [];
+  const drops = await fetchOpenSeaDrops();
 
   return drops.filter(
     drop =>
