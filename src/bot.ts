@@ -1,4 +1,5 @@
-import { listNetworks } from "./chains-registry";
+import { discoverFreeMints } from "./discovery";
+import { NETWORKS, listNetworks } from "./chains-registry";
 import "dotenv/config";
 import { Telegraf } from "telegraf";
 
@@ -45,10 +46,6 @@ bot.command("status", (ctx) => {
   );
 });
 
-bot.command("discover", (ctx) =>
-  ctx.reply("🔎 Discovery module coming in Phase 2.")
-);
-
 bot.command("wallets", (ctx) =>
   ctx.reply("🔒 No wallet signer configured.")
 );
@@ -63,6 +60,38 @@ bot.command("chains", (ctx) => {
     "\n\n⚠️ Live minting is not enabled."
   );
 });
+
+bot.command("discover", async (ctx) => {
+  const args = ctx.message.text.split(" ");
+  const chain = args[1]?.toLowerCase();
+
+  if (chain && !(chain in NETWORKS)) {
+    return ctx.reply(
+      "Unknown network. Use /chains to see available networks."
+    );
+  }
+
+  const drops = await discoverFreeMints(
+    chain as keyof typeof NETWORKS | undefined
+  );
+
+  if (drops.length === 0) {
+    return ctx.reply(
+      "🔎 No free mints found in the current discovery data.\n" +
+      "Live discovery sources are not connected yet."
+    );
+  }
+
+  return ctx.reply(
+    drops.map(drop =>
+      `🎨 ${drop.name}\n` +
+      `Chain: ${drop.chain}\n` +
+      `Price: FREE (network fees may apply)\n` +
+      `Source: ${drop.source}`
+    ).join("\n\n")
+  );
+});
+
 bot.launch()
   .then(() => console.log("NFT Scout Agent running"))
   .catch(console.error);
